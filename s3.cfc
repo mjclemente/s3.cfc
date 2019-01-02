@@ -114,10 +114,6 @@ component {
     return result;
   }
 
-  private void function missingObjectError( required struct awsResponse ) {
-    throw( object = awsResponse );
-  }
-
   /**
   * @hint Takes a region and combines it with the credentials to return the s3 client
   */

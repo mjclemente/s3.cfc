@@ -115,14 +115,7 @@ component {
   }
 
   private void function missingObjectError( required struct awsResponse ) {
-    throw(
-      message = awsResponse.message,
-      type = awsResponse.type,
-      detail = awsResponse.detail,
-      errorcode = awsResponse.errorCode,
-      extendedinfo = awsResponse.extendedInfo,
-      object = awsResponse
-    );
+    throw( object = awsResponse );
   }
 
   /**

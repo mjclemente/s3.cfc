@@ -45,11 +45,15 @@ component {
     var inputStream = awsObject.getObjectContent();
     var fos = createObject( "java", "java.io.FileOutputStream" ).init( destination );
     var bos = createObject( "java", "java.io.BufferedOutputStream" ).init( fos );
-    var aByte = javaCast( 'byte[]', [1024] );
-    var bytesRead = 0;
 
-    while ( ( bytesRead = inputStream.read( aByte ) ) != -1 ) {
+    var byteArray = createObject( "java", "java.io.ByteArrayOutputStream" ).init().toByteArray();
+    var byteArrayClass = byteArray.getClass().getComponentType();
+    var aByte = createObject("java","java.lang.reflect.Array").newInstance( byteArrayClass, javaCast( "int", 1024 ) );
+
+    var bytesRead = inputStream.read( aByte );
+    while ( bytesRead != -1 ) {
       bos.write( aByte, 0, bytesRead );
+      bytesRead = inputStream.read( aByte );
     }
     bos.flush();
     bos.close();

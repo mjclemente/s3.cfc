@@ -40,7 +40,7 @@ component {
     var awsObject = this.getObject( bucketName, key );
 
     //file not present
-    if ( awsObject.keyExists( 'ErrorCode' ) ) return awsObject;
+    if ( structKeyExists( awsObject, 'ErrorCode' ) ) return awsObject;
 
     var inputStream = awsObject.getObjectContent();
     var fos = createObject( "java", "java.io.FileOutputStream" ).init( destination );
@@ -65,7 +65,7 @@ component {
     var awsObject = this.getObject( bucketName, key );
 
     //file not present
-    if ( awsObject.keyExists( 'ErrorCode' ) ) return awsObject;
+    if ( structKeyExists( awsObject, 'ErrorCode' ) ) return awsObject;
 
     var s = createObject( "java", "java.util.Scanner" ).init( awsObject.getObjectContent() ).useDelimiter("\\A");
     var result = s.hasNext() ? s.next() : "";

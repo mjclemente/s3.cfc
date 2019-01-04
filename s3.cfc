@@ -59,7 +59,7 @@ component {
   public any function downloadFile( required string bucketName, required string key, required string destination ) {
     var awsObject = this.getObject( bucketName, key );
 
-    //file not present
+    //object not present
     if ( structKeyExists( awsObject, 'ErrorCode' ) ) return awsObject;
 
     var inputStream = awsObject.getObjectContent();
@@ -88,12 +88,26 @@ component {
   public any function readObject( required string bucketName, required string key ) {
     var awsObject = this.getObject( bucketName, key );
 
-    //file not present
+    //object not present
     if ( structKeyExists( awsObject, 'ErrorCode' ) ) return awsObject;
 
     var s = createObject( "java", "java.util.Scanner" ).init( awsObject.getObjectContent() ).useDelimiter("\\A");
     var result = s.hasNext() ? s.next() : "";
     s.close();
+    awsObject.close();
+    return result;
+  }
+
+  /**
+  * @hint convenience method for returning user metadata for an object. Throws an error if the object doesn't exist
+  */
+  public struct function getObjectUserMetadata( required string bucketName, required string key ) {
+    var awsObject = this.getObject( bucketName, key );
+    var result = {};
+    //object not present
+    if ( structKeyExists( awsObject, 'ErrorCode' ) ) throw( object = awsObject );
+
+    result = awsObject.getObjectMetadata().getUserMetadata();
     awsObject.close();
     return result;
   }

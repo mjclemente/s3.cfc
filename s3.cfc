@@ -23,11 +23,31 @@ component {
   /**
   * @hint Convenience method for putting a file as an object in a bucket
   * @filePath the absolute path to the file being added to the bucket
-  * @returns on Success, the putObjectResult object
+  * @returns on Success, the putObjectResult object, on Error, an AWS Error object, with Message, ErrorCode, ErrorMessage, and StatusCode keys, among others.
   */
   public any function putFile( required string bucketName, required string key, required string filePath ) {
     var file = createObject( "java", "java.io.File" ).init( filePath );
     var result = this.putObject( bucketName, key, file );
+    return result;
+  }
+
+  /**
+  * @hint Current only sets User Metadata - not set up to handle AWS properties for the metadata
+  * todo: https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html#object-metadata
+  * Metadata can't have spaces. It won't be set if it does
+  */
+  public any function putFileWithMetadata( required string bucketName, required string key, required string filePath, struct metadata = {} ) {
+    var file = createObject( "java", "java.io.File" ).init( filePath );
+    var awsRequest = createObject( "java", "com.amazonaws.services.s3.model.PutObjectRequest" ).init( bucketName, key, file );
+
+    var objectMetadata = createObject( "java", "com.amazonaws.services.s3.model.ObjectMetadata" );
+
+    for ( var item in metadata ) {
+      objectMetadata.addUserMetadata( item, metadata[ item ] );
+    }
+
+    awsRequest.setMetadata( objectMetadata );
+    var result = this.putObject( awsRequest );
     return result;
   }
 

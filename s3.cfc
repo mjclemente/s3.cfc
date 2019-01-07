@@ -43,7 +43,7 @@ component {
     var objectMetadata = createObject( "java", "com.amazonaws.services.s3.model.ObjectMetadata" );
 
     for ( var item in metadata ) {
-      objectMetadata.addUserMetadata( item, metadata[ item ] );
+      objectMetadata.addUserMetadata( javacast( "string", item ), javacast( "string", metadata[ item ] ) );
     }
 
     awsRequest.setMetadata( objectMetadata );

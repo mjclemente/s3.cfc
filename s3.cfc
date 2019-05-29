@@ -1,6 +1,6 @@
 /**
 * s3.cfc
-* Copyright 2018 Matthew Clemente, Brian Klaas
+* Copyright 2018-2019 Matthew Clemente, Brian Klaas
 * Licensed under MIT
 */
 component {

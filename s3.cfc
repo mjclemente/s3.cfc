@@ -10,14 +10,17 @@ component {
     required string secretKey,
     required string clientRegion ) {
 
-    var awsCredentials = createObject( 'java', 'com.amazonaws.auth.BasicAWSCredentials').init( accessKey, secretKey );
-
-    variables.awsStaticCredentialsProvider = createObject( 'java','com.amazonaws.auth.AWSStaticCredentialsProvider' ).init( awsCredentials );
-
+    variables.accessKey = accessKey;
+    variables.secretKey = secretKey;
     variables.region = clientRegion;
-    variables.s3Client = buildFromRegion();
 
     return this;
+  }
+
+  private any function s3Client() {
+    var awsCredentials = createObject( 'java', 'com.amazonaws.auth.BasicAWSCredentials').init( variables.accessKey, variables.secretKey );
+    var awsStaticCredentialsProvider = createObject( 'java','com.amazonaws.auth.AWSStaticCredentialsProvider' ).init( awsCredentials );
+    return buildFromRegion( awsStaticCredentialsProvider );
   }
 
   /**
@@ -140,7 +143,7 @@ component {
       methodArguments.append( missingMethodArguments[ index ] );
     }
     try {
-      var result = invoke( variables.s3Client, missingMethodName, methodArguments );
+      var result = invoke( s3Client(), missingMethodName, methodArguments );
     } catch ( any e ) {
       result = e;
     }
@@ -151,8 +154,9 @@ component {
   /**
   * @hint Takes a region and combines it with the credentials to return the s3 client
   */
-  private any function buildFromRegion() {
-    return createObject( 'java', 'com.amazonaws.services.s3.AmazonS3ClientBuilder').standard().withCredentials( variables.awsStaticCredentialsProvider ).withRegion( variables.region ).build();
+  private any function buildFromRegion( awsStaticCredentialsProvider ) {
+
+    return createObject( 'java', 'com.amazonaws.services.s3.AmazonS3ClientBuilder').standard().withCredentials( awsStaticCredentialsProvider ).withRegion( variables.region ).build();
   }
 
 }

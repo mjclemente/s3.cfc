@@ -170,7 +170,7 @@ component {
       result = e;
     }
 
-    return result;
+    return result ?: {};
   }
 
   /**

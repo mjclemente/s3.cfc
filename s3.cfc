@@ -46,7 +46,13 @@ component {
     var objectMetadata = createObject( "java", "com.amazonaws.services.s3.model.ObjectMetadata" );
 
     for ( var item in metadata ) {
-      objectMetadata.addUserMetadata( javacast( "string", item ), javacast( "string", metadata[ item ] ) );
+      if( item == "Content-Type" ){
+        objectMetadata.setContentType( metadata[ item ]  );
+      } else if ( item == "Content-Encoding" ) {
+        objectMetadata.setContentEncoding( metadata[ item ]  );
+      } else {
+        objectMetadata.addUserMetadata( javacast( "string", item ), javacast( "string", metadata[ item ] ) );
+      }
     }
 
     awsRequest.setMetadata( objectMetadata );

@@ -8,18 +8,26 @@ component {
   public any function init(
     required string accessKey,
     required string secretKey,
-    required string clientRegion ) {
+    required string clientRegion,
+    array jarLocation = [] ) {
 
     variables.accessKey = accessKey;
     variables.secretKey = secretKey;
     variables.region = clientRegion;
+    variables.jarLocation = jarLocation;
 
     return this;
   }
 
   private any function s3Client() {
-    var awsCredentials = createObject( 'java', 'com.amazonaws.auth.BasicAWSCredentials').init( variables.accessKey, variables.secretKey );
-    var awsStaticCredentialsProvider = createObject( 'java','com.amazonaws.auth.AWSStaticCredentialsProvider' ).init( awsCredentials );
+    if( variables.jarLocation.len() ){
+      var awsCredentials = createObject( 'java', 'com.amazonaws.auth.BasicAWSCredentials', variables.jarLocation ).init( variables.accessKey, variables.secretKey );
+      var awsStaticCredentialsProvider = createObject( 'java','com.amazonaws.auth.AWSStaticCredentialsProvider', variables.jarLocation ).init( awsCredentials );
+    } else {
+      var awsCredentials = createObject( 'java', 'com.amazonaws.auth.BasicAWSCredentials').init( variables.accessKey, variables.secretKey );
+      var awsStaticCredentialsProvider = createObject( 'java','com.amazonaws.auth.AWSStaticCredentialsProvider' ).init( awsCredentials );
+    }
+
     return buildFromRegion( awsStaticCredentialsProvider );
   }
 
@@ -41,9 +49,13 @@ component {
   */
   public any function putFileWithMetadata( required string bucketName, required string key, required string filePath, struct metadata = {} ) {
     var file = createObject( "java", "java.io.File" ).init( filePath );
-    var awsRequest = createObject( "java", "com.amazonaws.services.s3.model.PutObjectRequest" ).init( bucketName, key, file );
-
-    var objectMetadata = createObject( "java", "com.amazonaws.services.s3.model.ObjectMetadata" );
+    if( variables.jarLocation.len() ){
+      var awsRequest = createObject( "java", "com.amazonaws.services.s3.model.PutObjectRequest", variables.jarLocation ).init( bucketName, key, file );
+      var objectMetadata = createObject( "java", "com.amazonaws.services.s3.model.ObjectMetadata", variables.jarLocation );
+    } else {
+      var awsRequest = createObject( "java", "com.amazonaws.services.s3.model.PutObjectRequest" ).init( bucketName, key, file );
+      var objectMetadata = createObject( "java", "com.amazonaws.services.s3.model.ObjectMetadata" );
+    }
 
     for ( var item in metadata ) {
       if( item == "Content-Type" ){
@@ -124,7 +136,11 @@ component {
   public array function listObjectKeys( required string bucketName ) {
     var keys = [];
 
-    var req = createObject( "java", "com.amazonaws.services.s3.model.ListObjectsV2Request" ).init();
+    if( variables.jarLocation.len() ){
+      var req = createObject( "java", "com.amazonaws.services.s3.model.ListObjectsV2Request", variables.jarLocation ).init();
+    } else {
+      var req = createObject( "java", "com.amazonaws.services.s3.model.ListObjectsV2Request" ).init();
+    }
     //req.withBucketName( bucketName ).withMaxKeys( 2 );
     req.withBucketName( bucketName );
 
@@ -161,8 +177,11 @@ component {
   * @hint Takes a region and combines it with the credentials to return the s3 client
   */
   private any function buildFromRegion( awsStaticCredentialsProvider ) {
-
-    return createObject( 'java', 'com.amazonaws.services.s3.AmazonS3ClientBuilder').standard().withCredentials( awsStaticCredentialsProvider ).withRegion( variables.region ).build();
+    if( variables.jarLocation.len() ){
+      return createObject( 'java', 'com.amazonaws.services.s3.AmazonS3ClientBuilder', variables.jarLocation ).standard().withCredentials( awsStaticCredentialsProvider ).withRegion( variables.region ).build();
+    } else {
+      return createObject( 'java', 'com.amazonaws.services.s3.AmazonS3ClientBuilder').standard().withCredentials( awsStaticCredentialsProvider ).withRegion( variables.region ).build();
+    }
   }
 
 }

@@ -58,7 +58,7 @@ In order to use this component, you will need an IAM User with permission to wor
 
 ### Requirements
 
-This component depends on the .jar files contained in the `/lib` directory. All of these files can be downloaded from https://aws.amazon.com/sdk-for-java/ Files other than the actual SDK .jar itself can be found in the `/third-party` directory within the SDK download.
+This component depends on the .jar files contained in the `/lib` directory. All of these files can be downloaded from https://sdk-for-java.amazonwebservices.com/latest/aws-java-sdk.zip. Files other than the actual SDK .jar itself can be found in the `/third-party` directory within the SDK download.
 
 There are two ways that you can include them in your project.
 
@@ -70,3 +70,12 @@ There are two ways that you can include them in your project.
     	loadPaths = [ '.\path\to\jars\' ]
   	};
 	```
+
+The project was most recently tested using the following jars:
+
+- aws-java-sdk-1.12.185.jar
+- jackson-dataformat-cbor-2.12.6.jar
+- jackson-databind-2.12.6.jar
+- jackson-core-2.12.6.jar
+- jackson-annotations-2.12.6.jar
+- joda-time-2.8.1.jar
